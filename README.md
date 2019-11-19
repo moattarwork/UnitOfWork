@@ -1,5 +1,9 @@
 
 # EfCore.UnitOfWork
+
+[![Build status](https://ci.appveyor.com/api/projects/status/ch161ghkd68f5qnh?svg=true)](https://ci.appveyor.com/project/moattarwork/unitofwork)
+[![NuGet Status](https://img.shields.io/nuget/v/EfCore.UnitOfWork.svg)](https://www.nuget.org/packages/EfCore.UnitOfWork/)
+
 A library for Microsoft.EntityFrameworkCore to support repository, unit of work patterns, and multiple database with transaction support. The project is an initial fork from https://github.com/Arch/UnitOfWork/ in order to make the library easier to use.
 
 ## Doumentation
