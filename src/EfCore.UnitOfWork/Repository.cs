@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EfCore.UnitOfWork
 {
@@ -27,16 +28,22 @@ namespace EfCore.UnitOfWork
         
         public async Task<IEnumerable<TProjectedEntity>> GetProjectedListAsync<TProjectedEntity>(Expression<Func<TEntity, bool>> predicate,
             Func<TEntity, TProjectedEntity> projectedBy,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
-            await GetListProjectedByInternal(predicate, projectedBy, extendBy).ToListAsync();        
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) 
+        {
+            var results = await GetListInternal(predicate, extendBy).ToListAsync();
+            return results.Select(projectedBy).ToList();
+        }       
         
         public async Task<IEnumerable<TEntity>> GetListAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
-            await GetListInternal(p => true, extendBy).ToListAsync();        
-        
+            await GetListInternal(p => true, extendBy).ToListAsync();
+
         public async Task<IEnumerable<TProjectedEntity>> GetProjectedListAsync<TProjectedEntity>(
             Func<TEntity, TProjectedEntity> projectedBy,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
-            await GetListProjectedByInternal(p => true, projectedBy, extendBy).ToListAsync();
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null)
+        {
+            var results = await GetListInternal(p => true, extendBy).ToListAsync();
+            return results.Select(projectedBy).ToList();
+        }
         
         public IEnumerable<TEntity> GetList(Expression<Func<TEntity, bool>> predicate,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
@@ -45,14 +52,14 @@ namespace EfCore.UnitOfWork
         public IEnumerable<TProjectedEntity> GetProjectedList<TProjectedEntity>(Expression<Func<TEntity, bool>> predicate,
             Func<TEntity, TProjectedEntity> projectedBy,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
-            GetListProjectedByInternal(predicate, projectedBy, extendBy).ToList();
+            GetListInternal(predicate, extendBy).AsEnumerable().Select(projectedBy).ToList();
         
         public IEnumerable<TEntity> GetList(Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
             GetListInternal(p => true, extendBy).ToList();        
         
         public IEnumerable<TProjectedEntity> GetProjectedList<TProjectedEntity>(Func<TEntity, TProjectedEntity> projectedBy,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
-            GetListProjectedByInternal(p => true, projectedBy, extendBy).ToList();
+            GetListInternal(p => true, extendBy).AsEnumerable().Select(projectedBy).ToList();
 
         public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> extendBy = null) =>
@@ -83,13 +90,13 @@ namespace EfCore.UnitOfWork
             return queryable.Select(i => projectedBy(i));
         }         
         
-        public IQueryable<TEntity> FromSql(string sql, params object[] parameters) => _dbSet.FromSql(sql, parameters);
+        public IQueryable<TEntity> FromSql(string sql, params object[] parameters) => _dbSet.FromSqlRaw(sql, parameters);
 
         public TEntity Find(params object[] keyValues) => _dbSet.Find(keyValues);
 
-        public Task<TEntity> FindAsync(params object[] keyValues) => _dbSet.FindAsync(keyValues);
+        public ValueTask<TEntity> FindAsync(params object[] keyValues) => _dbSet.FindAsync(keyValues);
 
-        public Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken) => _dbSet.FindAsync(keyValues, cancellationToken);
+        public ValueTask<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken) => _dbSet.FindAsync(keyValues, cancellationToken);
 
         public int Count(Expression<Func<TEntity, bool>> predicate = null) => predicate == null ? _dbSet.Count() : _dbSet.Count(predicate);
 
@@ -99,7 +106,7 @@ namespace EfCore.UnitOfWork
 
         public void Insert(IEnumerable<TEntity> entities) => _dbSet.AddRange(entities);
 
-        public Task InsertAsync(TEntity entity, CancellationToken cancellationToken = default) => _dbSet.AddAsync(entity, cancellationToken);
+        public ValueTask<EntityEntry<TEntity>> InsertAsync(TEntity entity, CancellationToken cancellationToken = default) => _dbSet.AddAsync(entity, cancellationToken);
 
         public Task InsertAsync(params TEntity[] entities) => _dbSet.AddRangeAsync(entities);
 

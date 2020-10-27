@@ -13,11 +13,12 @@ namespace EfCore.UnitOfWork.UnitTests
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var name = $"{typeof(InMemoryDbContext).Name}_{Guid.NewGuid()}";
+            var name = $"{nameof(InMemoryDbContext)}_{Guid.NewGuid()}";
 
             var serviceProvider = new ServiceCollection()
                 .AddEntityFrameworkInMemoryDatabase()
                 .BuildServiceProvider();
+            
             optionsBuilder.UseInMemoryDatabase(name)
                 .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                 .UseInternalServiceProvider(serviceProvider);

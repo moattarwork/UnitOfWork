@@ -41,9 +41,9 @@ namespace EfCore.UnitOfWork
             return (IRepository<TEntity>)_repositories[type];
         }
 
-        public int ExecuteSqlCommand(string sql, params object[] parameters) => DbContext.Database.ExecuteSqlCommand(sql, parameters);
+        public int ExecuteSqlCommand(string sql, params object[] parameters) => DbContext.Database.ExecuteSqlRaw(sql, parameters);
 
-        public IQueryable<TEntity> FromSql<TEntity>(string sql, params object[] parameters) where TEntity : class => DbContext.Set<TEntity>().FromSql(sql, parameters);
+        public IQueryable<TEntity> FromSql<TEntity>(string sql, params object[] parameters) where TEntity : class => DbContext.Set<TEntity>().FromSqlRaw(sql, parameters);
 
         public int SaveChanges(bool ensureAutoHistory = false)
         {
