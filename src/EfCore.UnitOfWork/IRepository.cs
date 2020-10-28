@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EfCore.UnitOfWork
 {
@@ -11,13 +12,13 @@ namespace EfCore.UnitOfWork
     {
         IQueryable<TEntity> FromSql(string sql, params object[] parameters);
         TEntity Find(params object[] keyValues);
-        Task<TEntity> FindAsync(params object[] keyValues);
-        Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
+        ValueTask<TEntity> FindAsync(params object[] keyValues);
+        ValueTask<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
         int Count(Expression<Func<TEntity, bool>> predicate = null);
         void Insert(TEntity entity);
         void Insert(params TEntity[] entities);
         void Insert(IEnumerable<TEntity> entities);
-        Task InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
+        ValueTask<EntityEntry<TEntity>> InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
         Task InsertAsync(params TEntity[] entities);
         Task InsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
         void Update(TEntity entity);
