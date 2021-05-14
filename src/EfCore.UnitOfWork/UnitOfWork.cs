@@ -22,8 +22,7 @@ namespace EfCore.UnitOfWork
 
         public IRepository<TEntity> GetRepository<TEntity>(bool hasCustomRepository = false) where TEntity : class
         {
-            if (_repositories == null) 
-                _repositories = new Dictionary<Type, object>();
+            _repositories ??= new Dictionary<Type, object>();
 
             // TODO: Find a better way of resolving the repository
             if (hasCustomRepository)

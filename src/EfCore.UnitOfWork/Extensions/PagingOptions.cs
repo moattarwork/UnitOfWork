@@ -2,7 +2,7 @@ using System;
 
 namespace EfCore.UnitOfWork.Extensions
 {
-    public class PagingOptions
+    public sealed class PagingOptions
     {
         private const int DefaultPageSize = 20;
 
