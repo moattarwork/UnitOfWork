@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
+
 namespace EfCore.UnitOfWork
 {
     public interface IRepository<TEntity> where TEntity : class
